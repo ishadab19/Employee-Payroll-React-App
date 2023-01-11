@@ -46,6 +46,7 @@ export class Home extends React.Component {
                                 <th>Start Date</th>
                                 <th>Actions</th>
                             </tr>
+                            
 
                         </table>
                     </div>

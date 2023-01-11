@@ -5,6 +5,7 @@ import Pic2 from '../assets/avatar5.png'
 import Pic3 from '../assets/avatar6.png'
 import Pic4 from '../assets/img_avatar.png'
 import './PayrollForm.css'
+import EmployeeService from '../service/EmployeeService'
 
 const PayrollForm = () => {
     let initialValue = {
@@ -19,7 +20,7 @@ const PayrollForm = () => {
         note: '',
         profilePic: '',
         allDepartment: ["HR", "Sales", "Finance", "Engineer", "Others"],
-        department: [],
+        departmentValue: [],
         profileArray: [{ url: '../assets/avatar2.png' },
         { url: '../assets/avatar5.png' },
         { url: '../assets/avatar6.png' },
@@ -36,16 +37,16 @@ const PayrollForm = () => {
     };
 
     const onCheckChange = (name) => {
-        let index = formValue.department.indexOf(name);
-        let checkArray = [...formValue.department];
+        let index = formValue.departmentValue.indexOf(name);
+        let checkArray = [...formValue.departmentValue];
         if (index > -1) checkArray.splice(index, 1);
         else checkArray.push(name);
-        setForm({ ...formValue, department: checkArray });
+        setForm({ ...formValue, departmentValue: checkArray });
     };
 
     const getChecked = (name) => {
         return (
-            formValue.department && formValue.department.includes(name)
+            formValue.departmentValue && formValue.departmentValue.includes(name)
         );
     };
 
@@ -54,7 +55,7 @@ const PayrollForm = () => {
 
         let object = {
             name: formValue.name,
-            departments: formValue.department,
+            department: formValue.departmentValue,
             gender: formValue.gender,
             salary: formValue.salary,
             startDate: `${formValue.day} ${formValue.month} ${formValue.year}`,
@@ -62,6 +63,15 @@ const PayrollForm = () => {
             profilePic: formValue.profilePic,
         };
         console.log(object);
+
+        EmployeeService.addEmployee(object)
+        .then((response)=>{
+            alert("Employee Data Added Successfully");
+            console.log(response);
+        })
+        .catch((error)=>{
+            alert("Oops Somthing went Wrong..!!",error);
+        });
     };
 
     const reset = () => {
