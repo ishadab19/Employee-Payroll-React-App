@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import logo from '../assets/logo.png'
 import Pic1 from '../assets/avatar2.png'
 import Pic2 from '../assets/avatar5.png'
@@ -6,6 +6,7 @@ import Pic3 from '../assets/avatar6.png'
 import Pic4 from '../assets/img_avatar.png'
 import './PayrollForm.css'
 import EmployeeService from '../service/EmployeeService'
+import { useParams, Link } from "react-router-dom";
 
 const PayrollForm = () => {
     let initialValue = {
@@ -19,6 +20,7 @@ const PayrollForm = () => {
         year: "",
         note: '',
         profilePic: '',
+        isUpdate: false,
         allDepartment: ["HR", "Sales", "Finance", "Engineer", "Others"],
         departmentValue: [],
         profileArray: [{ url: '../assets/avatar2.png' },
@@ -29,6 +31,44 @@ const PayrollForm = () => {
     };
 
     const [formValue, setForm] = useState(initialValue);
+    const params = useParams();
+
+    useEffect(() => {
+        if (params.id) {
+            getDataById(params.id);
+        }
+    }, [params.id]);
+
+    const getDataById = (id) => {
+        EmployeeService.getEmployeeById(id)
+            .then((response) => {
+                let object = response.data.data;
+                setData(object);
+            })
+            .catch((err) => {
+                alert("err is ", err);
+            });
+    };
+
+    const setData = (obj) => {
+        let array = obj.startDate;
+        console.log(array);
+        console.log(obj);
+
+        setForm({
+            ...formValue,
+            ...obj,
+            id: obj.employeeId,
+            name: obj.name,
+            departmentValue: obj.department,
+            isUpdate: true,
+            day: array[0] + array[1],
+            month: array[3] + array[4] + array[5],
+            year: array[7] + array[8] + array[9] + array[10],
+            notes: obj.note,
+        });
+    };
+
 
     const changeValue = (event) => {
         console.log(event.target);
@@ -64,14 +104,34 @@ const PayrollForm = () => {
         };
         console.log(object);
 
-        EmployeeService.addEmployee(object)
-        .then((response)=>{
-            alert("Employee Data Added Successfully");
-            console.log(response);
-        })
-        .catch((error)=>{
-            alert("Oops Somthing went Wrong..!!",error);
-        });
+        if (formValue.isUpdate) {
+            var answer = window.confirm(
+                "Data once modified cannot be restored!! Do you wish to continue?"
+            );
+            if (answer === true) {
+                EmployeeService.updateEmployee(params.id, object)
+                    .then((data) => {
+                        console.log(data.data.data);
+                        alert("Data updated successfully!");
+                    })
+                    .catch((error) => {
+                        console.log("WARNING!! Error updating the data!", error);
+                    });
+            } else {
+                window.location.reload();
+            }
+        } else {
+            EmployeeService.addEmployee(object)
+                .then((response) => {
+                    console.log(response);
+                    const empData = response.data.data;
+                    console.log(empData);
+                    alert("Data Added successfully!!");
+                })
+                .catch((error) => {
+                    console.log("WARNING!! Error while adding the data!", error);
+                });
+        }
     };
 
     const reset = () => {
@@ -87,7 +147,10 @@ const PayrollForm = () => {
         <div className="payroll-main">
             <header className="header-content header">
                 <div className="logo-content">
-                    <img src={logo} alt="" />
+                    <Link to="/">
+                        {" "}
+                        <img src={logo} alt="" />
+                    </Link>
 
                     <div>
                         <span className="emp-text">EMPLOYEE</span> <br />

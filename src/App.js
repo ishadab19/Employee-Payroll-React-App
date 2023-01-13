@@ -1,6 +1,6 @@
 import React from "react";
 import PayrollForm from "./components/PayrollForm";
-import { Link, Route, Routes } from "react-router-dom";
+import {  Route, Routes } from "react-router-dom";
 import Home from "./components/Home";
 
 class App extends React.Component{
@@ -9,12 +9,13 @@ class App extends React.Component{
       <div>
         <Routes>
         <Route path="/form" element={<PayrollForm/>}/>
-          <Route path="/homepage" element={<Home/>}/>
+          <Route path="/" element={<Home/>}/>
+          <Route path="/form/:id" element={<PayrollForm/>}></Route>
         </Routes>
-        <h2>
+        {/* <h2>
           <Link to="/homepage" >Home </Link>  |
           <Link to="/form">PayrollForm </Link>
-        </h2>
+        </h2> */}
       </div>
     );
   }
